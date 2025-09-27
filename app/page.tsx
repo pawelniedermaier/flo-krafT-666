@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
+// Removed react-beautiful-dnd due to React 18 compatibility issues
 import {
   Plus,
   Search,
@@ -228,10 +228,16 @@ export default function FlowCraft() {
     location: "",
     managerId: "",
   })
-  const [newIssue, setNewIssue] = useState({
+  const [newIssue, setNewIssue] = useState<{
+    title: string
+    description: string
+    priority: Issue["priority"]
+    assigneeId: string
+    sprintId: string | undefined
+  }>({
     title: "",
     description: "",
-    priority: "P3" as Issue["priority"],
+    priority: "P3",
     assigneeId: "",
     sprintId: undefined,
   })
@@ -391,18 +397,34 @@ export default function FlowCraft() {
     setIssues(issues.map((issue) => (issue.id === issueId ? { ...issue, sprintId } : issue)))
   }
 
-  // Drag and drop handler
-  const onDragEnd = (result: any) => {
-    if (!result.destination) return
+  // Drag and drop handler using HTML5 Drag and Drop API
+  const [draggedIssue, setDraggedIssue] = useState<string | null>(null)
 
-    const { source, destination, draggableId } = result
+  const handleDragStart = (e: React.DragEvent, issueId: string) => {
+    setDraggedIssue(issueId)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/html', issueId)
+  }
 
-    if (source.droppableId === destination.droppableId && source.index === destination.index) {
-      return
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleDrop = (e: React.DragEvent, targetStatus: Issue["status"]) => {
+    e.preventDefault()
+    const issueId = e.dataTransfer.getData('text/html')
+    
+    if (issueId && draggedIssue === issueId) {
+      setIssues(issues.map((issue) => 
+        issue.id === issueId ? { ...issue, status: targetStatus } : issue
+      ))
     }
+    setDraggedIssue(null)
+  }
 
-    const newStatus = destination.droppableId as Issue["status"]
-    setIssues(issues.map((issue) => (issue.id === draggableId ? { ...issue, status: newStatus } : issue)))
+  const handleDragEnd = () => {
+    setDraggedIssue(null)
   }
 
   // ADDING BULK ASSIGNMENT FUNCTIONALITY AND QUICK ASSIGN FEATURES
@@ -1246,87 +1268,75 @@ export default function FlowCraft() {
                     </CardContent>
                   </Card>
                 ) : (
-                  <DragDropContext onDragEnd={onDragEnd}>
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                      {(["todo", "in-progress", "in-review", "done"] as const).map((status) => (
-                        <div key={status} className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-medium text-foreground capitalize">{status.replace("-", " ")}</h3>
-                            <Badge variant="secondary" className="text-xs">
-                              {activeSprintIssues.filter((issue) => issue.status === status).length}
-                            </Badge>
-                          </div>
-                          <Droppable droppableId={status}>
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                                className={`min-h-[500px] p-3 rounded-lg border-2 border-dashed transition-colors ${
-                                  snapshot.isDraggingOver ? "border-primary bg-primary/5" : "border-border bg-muted/20"
-                                }`}
-                              >
-                                {activeSprintIssues
-                                  .filter((issue) => issue.status === status)
-                                  .map((issue, index) => {
-                                    const assignee = issue.assigneeId ? getUserById(issue.assigneeId) : null
-                                    return (
-                                      <Draggable key={issue.id} draggableId={issue.id} index={index}>
-                                        {(provided, snapshot) => (
-                                          <Card
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                            className={`mb-3 cursor-move transition-all ${
-                                              snapshot.isDragging
-                                                ? "rotate-2 scale-105 shadow-lg"
-                                                : "professional-card hover-lift"
-                                            }`}
-                                          >
-                                            <CardContent className="p-3">
-                                              <div className="flex items-center gap-2 mb-2">
-                                                <Badge variant="outline" className="text-xs font-mono">
-                                                  {issue.id}
-                                                </Badge>
-                                                <Badge className={`text-xs priority-${issue.priority.toLowerCase()}`}>
-                                                  {issue.priority}
-                                                </Badge>
-                                              </div>
-                                              <h4 className="font-medium text-sm mb-2 line-clamp-2">{issue.title}</h4>
-                                              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                                                {issue.description}
-                                              </p>
-                                              <div className="flex items-center gap-2">
-                                                {assignee ? (
-                                                  <>
-                                                    <Avatar className="w-5 h-5">
-                                                      <AvatarImage src={assignee.avatar || "/placeholder.svg"} />
-                                                      <AvatarFallback className="text-xs">
-                                                        {assignee.name
-                                                          .split(" ")
-                                                          .map((n) => n[0])
-                                                          .join("")}
-                                                      </AvatarFallback>
-                                                    </Avatar>
-                                                    <span className="text-xs text-foreground">{assignee.name}</span>
-                                                  </>
-                                                ) : (
-                                                  <span className="text-xs text-muted-foreground">Unassigned</span>
-                                                )}
-                                              </div>
-                                            </CardContent>
-                                          </Card>
-                                        )}
-                                      </Draggable>
-                                    )
-                                  })}
-                                {provided.placeholder}
-                              </div>
-                            )}
-                          </Droppable>
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {(["todo", "in-progress", "in-review", "done"] as const).map((status) => (
+                      <div key={status} className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-medium text-foreground capitalize">{status.replace("-", " ")}</h3>
+                          <Badge variant="secondary" className="text-xs">
+                            {activeSprintIssues.filter((issue) => issue.status === status).length}
+                          </Badge>
                         </div>
-                      ))}
-                    </div>
-                  </DragDropContext>
+                        <div
+                          className="min-h-[500px] p-3 rounded-lg border-2 border-dashed border-border bg-muted/20 transition-colors"
+                          onDragOver={handleDragOver}
+                          onDrop={(e) => handleDrop(e, status)}
+                        >
+                          {activeSprintIssues
+                            .filter((issue) => issue.status === status)
+                            .map((issue) => {
+                              const assignee = issue.assigneeId ? getUserById(issue.assigneeId) : null
+                              return (
+                                <Card
+                                  key={issue.id}
+                                  draggable
+                                  onDragStart={(e) => handleDragStart(e, issue.id)}
+                                  onDragEnd={handleDragEnd}
+                                  className={`mb-3 cursor-move transition-all ${
+                                    draggedIssue === issue.id
+                                      ? "opacity-50 scale-95"
+                                      : "professional-card hover-lift"
+                                  }`}
+                                >
+                                  <CardContent className="p-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Badge variant="outline" className="text-xs font-mono">
+                                        {issue.id}
+                                      </Badge>
+                                      <Badge className={`text-xs priority-${issue.priority.toLowerCase()}`}>
+                                        {issue.priority}
+                                      </Badge>
+                                    </div>
+                                    <h4 className="font-medium text-sm mb-2 line-clamp-2">{issue.title}</h4>
+                                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                                      {issue.description}
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                      {assignee ? (
+                                        <>
+                                          <Avatar className="w-5 h-5">
+                                            <AvatarImage src={assignee.avatar || "/placeholder.svg"} />
+                                            <AvatarFallback className="text-xs">
+                                              {assignee.name
+                                                .split(" ")
+                                                .map((n) => n[0])
+                                                .join("")}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <span className="text-xs text-foreground">{assignee.name}</span>
+                                        </>
+                                      ) : (
+                                        <span className="text-xs text-muted-foreground">Unassigned</span>
+                                      )}
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              )
+                            })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             )}
