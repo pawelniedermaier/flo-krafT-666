@@ -228,6 +228,7 @@ export default function FlowCraft() {
   const [activeView, setActiveView] = useState<"issues" | "kanban" | "sprints" | "users" | "organization" | "tarot">("issues")
   const [tarotCard, setTarotCard] = useState<{ name: string; meaning: string; advice: string } | null>(null)
   const [destinyCard, setDestinyCard] = useState<{ name: string; subtitle: string; image: string; description: string } | null>(null)
+  const [isDestinyModalOpen, setIsDestinyModalOpen] = useState(false)
   const [standardTheme, setStandardTheme] = useState<"light" | "dark">("light")
   const [cyberpunkTheme, setCyberpunkTheme] = useState<"cyberpunk" | "turbo-matrix">("cyberpunk")
   const [isStandardMode, setIsStandardMode] = useState(true) // true = standard themes, false = cyberpunk themes
@@ -643,22 +644,23 @@ export default function FlowCraft() {
       description: "You've received the \"green light\"! It's time to hit the ground running, as this is a perfect opportunity for you to prove the project makes sense yourself. Good luck, because from now on, everything depends solely on you."
     },
     {
-      name: "VIII Justice",
-      subtitle: "The Process (Stop)",
-      image: "/stop.png",
-      description: "Hold on a moment! Your decision requires \"further analysis\" and going through \"necessary procedures.\" Expect your idea to be trapped in bureaucratic limbo, where truth is relative and the process is eternal."
-    },
-    {
       name: "XII The Hanged Man",
       subtitle: "The Justification (No Go)",
-      image: "/process.png",
+      image: "/stop.png",
       description: "Your project is \"suspended\" awaiting... better times. Prepare for acrobatics to justify why it didn't work. Most likely, you'll end up being blamed, but at least you'll gain a \"new perspective.\""
+    },
+    {
+      name: "VIII Justice",
+      subtitle: "The Process (Stop)",
+      image: "/process.png",
+      description: "Hold on a moment! Your decision requires \"further analysis\" and going through \"necessary procedures.\" Expect your idea to be trapped in bureaucratic limbo, where truth is relative and the process is eternal."
     }
   ]
 
   const drawDestinyCard = () => {
     const randomCard = destinyCards[Math.floor(Math.random() * destinyCards.length)]
     setDestinyCard(randomCard)
+    setIsDestinyModalOpen(true)
   }
 
   // Organization Chart Component
@@ -1964,6 +1966,107 @@ export default function FlowCraft() {
                   </p>
                 </div>
 
+                {/* Destiny - Decision Feature */}
+                <Card className="bg-gradient-to-r from-indigo-950 to-purple-950 border-purple-500 border-2 shadow-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-purple-200 flex items-center gap-2">
+                      <span>⚖️</span> Destiny - Decision
+                    </CardTitle>
+                    <p className="text-purple-300 text-sm mt-2">
+                      Consult the ancient cards to determine your project's fate: Go, Stop, or Process?
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Draw Card Section */}
+                      <div className="space-y-4">
+                        <Button
+                          onClick={drawDestinyCard}
+                          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-6 text-lg shadow-lg hover:shadow-purple-500/50 transition-all"
+                        >
+                          <span className="mr-2">✨</span>
+                          REVEAL YOUR DESTINY
+                          <span className="ml-2">✨</span>
+                        </Button>
+
+                        {destinyCard && (
+                          <div className="space-y-4 animate-in fade-in zoom-in duration-500">
+                            <div className="bg-gradient-to-b from-purple-900 to-indigo-900 p-6 rounded-lg border-2 border-purple-400 shadow-xl">
+                              <div className="text-center space-y-3">
+                                <div className="flex justify-center">
+                                  <div className="w-32 h-32 flex items-center justify-center">
+                                    <img
+                                      src={destinyCard.image}
+                                      alt={destinyCard.name}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  </div>
+                                </div>
+                                <h3 className="text-xl font-bold text-purple-100">{destinyCard.name}</h3>
+                                <p className="text-lg text-purple-300 font-semibold">{destinyCard.subtitle}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {!destinyCard && (
+                          <div className="text-center py-12 border-2 border-dashed border-purple-700 rounded-lg bg-purple-950/30">
+                            <p className="text-purple-400 text-sm italic">The fates await your query...</p>
+                            <p className="text-purple-500 text-xs mt-2">🎴 Will you receive the green light? 🎴</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Card Description */}
+                      {destinyCard && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-right duration-500">
+                          <div className="bg-purple-950/50 p-6 rounded-lg border border-purple-700">
+                            <h4 className="text-purple-300 font-semibold mb-3 flex items-center gap-2">
+                              <span>📜</span> The Prophecy:
+                            </h4>
+                            <p className="text-purple-200 leading-relaxed">
+                              {destinyCard.description}
+                            </p>
+                          </div>
+
+                          <Button
+                            onClick={drawDestinyCard}
+                            variant="outline"
+                            className="w-full border-purple-500 text-purple-300 hover:bg-purple-900/50"
+                          >
+                            Seek Another Destiny
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Legend */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-purple-700">
+                      <div className="bg-green-950/30 p-4 rounded-lg border border-green-700">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">🟢</span>
+                          <p className="text-green-300 font-semibold text-sm">The Magician</p>
+                        </div>
+                        <p className="text-green-400 text-xs">Green Light - Full speed ahead!</p>
+                      </div>
+                      <div className="bg-red-950/30 p-4 rounded-lg border border-red-700">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">🔴</span>
+                          <p className="text-red-300 font-semibold text-sm">The Hanged Man</p>
+                        </div>
+                        <p className="text-red-400 text-xs">No Go - Suspended indefinitely</p>
+                      </div>
+                      <div className="bg-yellow-950/30 p-4 rounded-lg border border-yellow-700">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">🟡</span>
+                          <p className="text-yellow-300 font-semibold text-sm">Justice</p>
+                        </div>
+                        <p className="text-yellow-400 text-xs">Process - Think and decide</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Main Tarot Card Area */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Left: Tarot Draw */}
@@ -2070,107 +2173,6 @@ export default function FlowCraft() {
                         <p className="text-purple-400 text-sm mb-1">Meetings This Week</p>
                         <p className="text-3xl font-bold text-purple-200">Too Many</p>
                         <p className="text-purple-500 text-xs mt-1">Could have been emails</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Destiny - Decision Feature */}
-                <Card className="bg-gradient-to-r from-indigo-950 to-purple-950 border-purple-500 border-2 shadow-2xl">
-                  <CardHeader>
-                    <CardTitle className="text-purple-200 flex items-center gap-2">
-                      <span>⚖️</span> Destiny - Decision
-                    </CardTitle>
-                    <p className="text-purple-300 text-sm mt-2">
-                      Consult the ancient cards to determine your project's fate: Go, Stop, or Process?
-                    </p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Draw Card Section */}
-                      <div className="space-y-4">
-                        <Button
-                          onClick={drawDestinyCard}
-                          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-6 text-lg shadow-lg hover:shadow-purple-500/50 transition-all"
-                        >
-                          <span className="mr-2">✨</span>
-                          REVEAL YOUR DESTINY
-                          <span className="ml-2">✨</span>
-                        </Button>
-
-                        {!destinyCard && (
-                          <div className="text-center py-12 border-2 border-dashed border-purple-700 rounded-lg bg-purple-950/30">
-                            <p className="text-purple-400 text-sm italic">The fates await your query...</p>
-                            <p className="text-purple-500 text-xs mt-2">🎴 Will you receive the green light? 🎴</p>
-                          </div>
-                        )}
-
-                        {destinyCard && (
-                          <div className="space-y-4 animate-in fade-in zoom-in duration-500">
-                            <div className="bg-gradient-to-b from-purple-900 to-indigo-900 p-6 rounded-lg border-2 border-purple-400 shadow-xl">
-                              <div className="text-center space-y-3">
-                                <div className="flex justify-center">
-                                  <div className="w-32 h-32 flex items-center justify-center">
-                                    <img
-                                      src={destinyCard.image}
-                                      alt={destinyCard.name}
-                                      className="w-full h-full object-contain"
-                                    />
-                                  </div>
-                                </div>
-                                <h3 className="text-xl font-bold text-purple-100">{destinyCard.name}</h3>
-                                <p className="text-lg text-purple-300 font-semibold">{destinyCard.subtitle}</p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Card Description */}
-                      {destinyCard && (
-                        <div className="space-y-4 animate-in fade-in slide-in-from-right duration-500">
-                          <div className="bg-purple-950/50 p-6 rounded-lg border border-purple-700">
-                            <h4 className="text-purple-300 font-semibold mb-3 flex items-center gap-2">
-                              <span>📜</span> The Prophecy:
-                            </h4>
-                            <p className="text-purple-200 leading-relaxed">
-                              {destinyCard.description}
-                            </p>
-                          </div>
-
-                          <Button
-                            onClick={drawDestinyCard}
-                            variant="outline"
-                            className="w-full border-purple-500 text-purple-300 hover:bg-purple-900/50"
-                          >
-                            Seek Another Destiny
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Legend */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-purple-700">
-                      <div className="bg-green-950/30 p-4 rounded-lg border border-green-700">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-2xl">🟢</span>
-                          <p className="text-green-300 font-semibold text-sm">The Magician</p>
-                        </div>
-                        <p className="text-green-400 text-xs">Green Light - Full speed ahead!</p>
-                      </div>
-                      <div className="bg-red-950/30 p-4 rounded-lg border border-red-700">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-2xl">🔴</span>
-                          <p className="text-red-300 font-semibold text-sm">Justice</p>
-                        </div>
-                        <p className="text-red-400 text-xs">Stop - Bureaucratic limbo awaits</p>
-                      </div>
-                      <div className="bg-yellow-950/30 p-4 rounded-lg border border-yellow-700">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-2xl">🟡</span>
-                          <p className="text-yellow-300 font-semibold text-sm">The Hanged Man</p>
-                        </div>
-                        <p className="text-yellow-400 text-xs">No Go - Suspended indefinitely</p>
                       </div>
                     </div>
                   </CardContent>
@@ -2423,6 +2425,91 @@ export default function FlowCraft() {
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* Destiny Card Modal - Fullscreen */}
+      {destinyCard && isDestinyModalOpen && (
+        <div className="fixed inset-0 z-50 bg-gradient-to-br from-purple-950 to-indigo-950">
+          {/* Close Button - Top Right */}
+          <button
+            onClick={() => setIsDestinyModalOpen(false)}
+            className="absolute top-6 right-6 z-50 w-16 h-16 flex items-center justify-center bg-purple-600 hover:bg-purple-500 rounded-full border-4 border-purple-400 shadow-2xl hover:shadow-purple-500/50 transition-all group"
+          >
+            <span className="text-4xl text-white font-bold group-hover:scale-110 transition-transform">×</span>
+          </button>
+
+          {/* Full Screen Grid Layout */}
+          <div className="grid grid-cols-[1fr_600px] h-full">
+            {/* Left Side - Full Height Image */}
+            <div className="flex items-center justify-center bg-gradient-to-br from-purple-900/30 to-indigo-900/30 p-12 border-r-4 border-purple-500">
+              <div className="w-full h-full max-w-[800px] max-h-[90vh] flex items-center justify-center bg-gradient-to-b from-purple-900 to-indigo-900 rounded-2xl border-4 border-purple-400 shadow-2xl p-8">
+                {destinyCard.image && (
+                  <img
+                    src={destinyCard.image}
+                    alt={destinyCard.name}
+                    className="w-full h-full object-contain drop-shadow-2xl"
+                    onError={(e) => {
+                      console.error("Image failed to load:", destinyCard.image);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Right Side - Fixed Width Info Panel */}
+            <div className="flex flex-col bg-gradient-to-br from-purple-950 to-indigo-950 overflow-y-auto">
+              {/* Header */}
+              <div className="p-8 border-b-4 border-purple-500">
+                <h2 className="text-3xl text-purple-100 text-center font-bold flex items-center justify-center gap-3">
+                  <span className="text-4xl">⚖️</span>
+                  Your Destiny
+                  <span className="text-4xl">⚖️</span>
+                </h2>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 p-8 space-y-8 overflow-y-auto">
+                  {/* Card Title */}
+                  <div className="bg-gradient-to-r from-purple-900/80 to-indigo-900/80 rounded-xl p-8 border-4 border-purple-500">
+                    <h3 className="text-5xl font-bold text-purple-100 text-center mb-4 drop-shadow-lg">
+                      {destinyCard.name}
+                    </h3>
+                    <div className="flex justify-center">
+                      <p className="text-3xl text-purple-300 font-bold bg-purple-900/80 px-8 py-3 rounded-full border-2 border-purple-400">
+                        {destinyCard.subtitle}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Description */}
+                  <div className="bg-gradient-to-br from-purple-950/90 to-indigo-950/90 p-8 rounded-xl border-4 border-purple-600 shadow-xl">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-purple-700">
+                      <span className="text-4xl">📜</span>
+                      <h4 className="text-3xl text-purple-200 font-bold">
+                        The Prophecy
+                      </h4>
+                    </div>
+                    <p className="text-purple-100 leading-relaxed text-2xl font-medium">
+                      {destinyCard.description}
+                    </p>
+                  </div>
+                </div>
+
+              {/* Footer - Close Button */}
+              <div className="p-8 border-t-4 border-purple-500">
+                <Button
+                  onClick={() => setIsDestinyModalOpen(false)}
+                  className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-500 hover:via-indigo-500 hover:to-purple-500 text-white font-bold py-8 text-2xl shadow-lg hover:shadow-purple-500/50 transition-all border-4 border-purple-400"
+                >
+                  <span className="mr-3 text-3xl">✨</span>
+                  Accept Your Fate
+                  <span className="ml-3 text-3xl">✨</span>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
