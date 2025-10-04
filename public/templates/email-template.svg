@@ -1,0 +1,10 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="800" height="600" fill="white" stroke="#ddd" stroke-width="2"/>
+<rect x="40" y="40" width="720" height="40" fill="#f8f9fa" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="65" font-family="Arial, sans-serif" font-size="12" fill="#333">To: team@company.com</text>
+<rect x="40" y="100" width="720" height="40" fill="#f8f9fa" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="125" font-family="Arial, sans-serif" font-size="14" fill="#1a1a1a">Subject: Weekly Team Update</text>
+<text x="40" y="180" font-family="Arial, sans-serif" font-size="14" fill="#333">Dear Team,</text>
+<rect x="40" y="200" width="720" height="280" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="360" font-family="Arial, sans-serif" font-size="14" fill="#333">Best regards,</text>
+</svg>

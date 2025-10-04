@@ -1,0 +1,8 @@
+<svg width="800" height="1000" viewBox="0 0 800 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="800" height="1000" fill="white" stroke="#ddd" stroke-width="2"/>
+<rect x="40" y="40" width="720" height="120" fill="#f8f9fa" stroke="#e5e7eb" stroke-width="1"/>
+<text x="400" y="100" font-family="Arial, sans-serif" font-size="24" fill="#1a1a1a" text-anchor="middle">INTERNAL MEMORANDUM</text>
+<text x="40" y="200" font-family="Arial, sans-serif" font-size="18" fill="#333">Subject: Quarterly Performance Review</text>
+<rect x="40" y="320" width="720" height="360" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="720" font-family="Arial, sans-serif" font-size="12" fill="#666">Best regards, Management Team</text>
+</svg>

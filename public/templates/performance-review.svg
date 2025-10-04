@@ -1,0 +1,12 @@
+<svg width="800" height="1000" viewBox="0 0 800 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="800" height="1000" fill="white" stroke="#ddd" stroke-width="2"/>
+<rect x="40" y="40" width="720" height="80" fill="#f8f9fa" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="80" font-family="Arial, sans-serif" font-size="18" fill="#1a1a1a">Employee: John Smith</text>
+<text x="40" y="180" font-family="Arial, sans-serif" font-size="14" fill="#666">Q4 2024 Performance Review</text>
+<rect x="40" y="200" width="720" height="160" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="220" font-family="Arial, sans-serif" font-size="14" fill="#333">Strengths:</text>
+<rect x="40" y="380" width="720" height="160" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="400" font-family="Arial, sans-serif" font-size="14" fill="#333">Areas for Improvement:</text>
+<rect x="40" y="560" width="720" height="96" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="580" font-family="Arial, sans-serif" font-size="14" fill="#333">Goals for Next Quarter:</text>
+</svg>

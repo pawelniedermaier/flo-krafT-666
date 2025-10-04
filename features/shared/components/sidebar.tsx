@@ -12,14 +12,19 @@ import {
   Sparkles,
   Sun,
   Moon,
-  Zap
+  Zap,
+  Brain,
+  Image as ImageIcon,
+  Bell,
+  Trophy,
+  AlertTriangle
 } from "lucide-react"
 import type { User, ViewMode } from "@/lib/types"
 import { PLACEHOLDER_AVATAR } from "@/lib/constants"
 
 interface SidebarProps {
-  activeView: ViewMode | "issues" | "organization" | "tarot"
-  onViewChange: (view: ViewMode | "issues" | "organization" | "tarot") => void
+  activeView: ViewMode | "issues" | "organization" | "tarot" | "text-analysis" | "image-overlay" | "notifications" | "leaderboard" | "competitive-reports"
+  onViewChange: (view: ViewMode | "issues" | "organization" | "tarot" | "text-analysis" | "image-overlay" | "notifications" | "leaderboard" | "competitive-reports") => void
   currentUser: User | null
   users: User[]
   onUserChange: (user: User) => void
@@ -105,21 +110,75 @@ export function Sidebar({
           )
         })}
 
+        {/* Corporate Culture Tools */}
+        <div className="my-2 border-t border-sidebar-border" />
+        
+        {/* Text Analysis */}
+        <Button
+          variant={activeView === "text-analysis" ? "default" : "ghost"}
+          onClick={() => onViewChange("text-analysis")}
+          className="w-full justify-start gap-3 h-10"
+        >
+          <Brain className="size-4" />
+          Text Analysis
+        </Button>
+
+        {/* Image Overlay */}
+        <Button
+          variant={activeView === "image-overlay" ? "default" : "ghost"}
+          onClick={() => onViewChange("image-overlay")}
+          className="w-full justify-start gap-3 h-10"
+        >
+          <ImageIcon className="size-4" />
+          Image Overlay
+        </Button>
+
+        {/* Notifications - Only for Boss and Director */}
+        {(currentUser?.role === "boss" || currentUser?.role === "director") && (
+          <Button
+            variant={activeView === "notifications" ? "default" : "ghost"}
+            onClick={() => onViewChange("notifications")}
+            className="w-full justify-start gap-3 h-10"
+          >
+            <Bell className="size-4" />
+            Notifications
+          </Button>
+        )}
+
+        {/* Leaderboard - Only for Boss and Director */}
+        {(currentUser?.role === "boss" || currentUser?.role === "director") && (
+          <Button
+            variant={activeView === "leaderboard" ? "default" : "ghost"}
+            onClick={() => onViewChange("leaderboard")}
+            className="w-full justify-start gap-3 h-10"
+          >
+            <Trophy className="size-4" />
+            Leaderboard
+          </Button>
+        )}
+
+        {/* Competitive Reports */}
+        <Button
+          variant={activeView === "competitive-reports" ? "default" : "ghost"}
+          onClick={() => onViewChange("competitive-reports")}
+          className="w-full justify-start gap-3 h-10"
+        >
+          <AlertTriangle className="size-4" />
+          Competitive Reports
+        </Button>
+
         {/* Tarot AI Boost - Only for Boss */}
         {currentUser?.role === "boss" && (
-          <>
-            <div className="my-2 border-t border-sidebar-border" />
-            <Button
-              variant={activeView === "tarot" ? "default" : "ghost"}
-              onClick={() => onViewChange("tarot")}
-              className={`w-full justify-start gap-3 h-10 ${
-                activeView === "tarot" ? "bg-gradient-to-r from-purple-600 to-indigo-600" : ""
-              }`}
-            >
-              <Sparkles className="size-4" />
-              TAROT AI BOOST
-            </Button>
-          </>
+          <Button
+            variant={activeView === "tarot" ? "default" : "ghost"}
+            onClick={() => onViewChange("tarot")}
+            className={`w-full justify-start gap-3 h-10 ${
+              activeView === "tarot" ? "bg-gradient-to-r from-purple-600 to-indigo-600" : ""
+            }`}
+          >
+            <Sparkles className="size-4" />
+            TAROT AI BOOST
+          </Button>
         )}
       </nav>
 
@@ -160,6 +219,18 @@ export function Sidebar({
             }}
           >
             Switch User
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full text-xs"
+            onClick={() => {
+              // Clear the current user to show user selection screen
+              localStorage.removeItem("flowcraft-current-user")
+              window.location.reload()
+            }}
+          >
+            Choose Different User
           </Button>
         </div>
 

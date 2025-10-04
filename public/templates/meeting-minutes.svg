@@ -1,0 +1,12 @@
+<svg width="800" height="1000" viewBox="0 0 800 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="800" height="1000" fill="white" stroke="#ddd" stroke-width="2"/>
+<rect x="40" y="40" width="720" height="100" fill="#f8f9fa" stroke="#e5e7eb" stroke-width="1"/>
+<text x="400" y="100" font-family="Arial, sans-serif" font-size="20" fill="#1a1a1a" text-anchor="middle">Weekly Team Standup</text>
+<text x="40" y="160" font-family="Arial, sans-serif" font-size="14" fill="#666">Date: December 15, 2024 | Time: 10:00 AM</text>
+<rect x="40" y="200" width="720" height="120" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="220" font-family="Arial, sans-serif" font-size="12" fill="#444">Attendees: John Smith, Jane Doe, Mike Johnson, Sarah Wilson</text>
+<rect x="40" y="340" width="720" height="160" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="360" font-family="Arial, sans-serif" font-size="14" fill="#333">Agenda:</text>
+<rect x="40" y="520" width="720" height="160" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+<text x="40" y="540" font-family="Arial, sans-serif" font-size="14" fill="#333">Action Items:</text>
+</svg>

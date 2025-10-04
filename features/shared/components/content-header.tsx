@@ -1,17 +1,18 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Plus, UserPlus, Calendar } from "lucide-react"
+import { Plus, UserPlus, Calendar, AlertTriangle } from "lucide-react"
 import type { ViewMode, Sprint, Issue, User } from "@/lib/types"
 
 interface ContentHeaderProps {
-  activeView: ViewMode | "organization" | "tarot"
+  activeView: ViewMode | "organization" | "tarot" | "competitive-reports"
   issues: Issue[]
   sprints: Sprint[]
   users: User[]
   onNewIssue?: () => void
   onNewSprint?: () => void
   onNewUser?: () => void
+  onNewReport?: () => void
 }
 
 export function ContentHeader({
@@ -22,6 +23,7 @@ export function ContentHeader({
   onNewIssue,
   onNewSprint,
   onNewUser,
+  onNewReport,
 }: ContentHeaderProps) {
   const activeSprint = sprints.find((s) => s.status === "active")
 
@@ -39,6 +41,8 @@ export function ContentHeader({
         return "Organization"
       case "tarot":
         return "TAROT AI BOOST™"
+      case "competitive-reports":
+        return "Competitive Reports"
       default:
         return ""
     }
@@ -58,6 +62,8 @@ export function ContentHeader({
         return "Company hierarchy and reporting structure"
       case "tarot":
         return "🔮 Mystical insights for the enlightened leader"
+      case "competitive-reports":
+        return "Compete with colleagues in the ultimate reporting challenge"
       default:
         return ""
     }
@@ -93,6 +99,12 @@ export function ContentHeader({
             <Button className="gap-2" onClick={onNewUser}>
               <UserPlus className="size-4" />
               New User
+            </Button>
+          )}
+          {activeView === "competitive-reports" && onNewReport && (
+            <Button className="gap-2 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500" onClick={onNewReport}>
+              <AlertTriangle className="size-4" />
+              Submit Report
             </Button>
           )}
         </div>
