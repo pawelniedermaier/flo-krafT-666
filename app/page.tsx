@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -38,10 +39,11 @@ interface User {
   id: string
   name: string
   email: string
-  role: "admin" | "manager" | "developer" | "designer" | "qa"
+  role: "boss" | "manager" | "developer" | "designer" | "qa"
   avatar?: string
   phone?: string
   location?: string
+  birthDate?: Date
   joinedAt: Date
   isActive: boolean
   managerId?: string
@@ -77,7 +79,8 @@ const initialUsers: User[] = [
     avatar: "/professional-developer-avatar.png",
     phone: "+1 (555) 123-4567",
     location: "San Francisco, CA",
-    joinedAt: new Date("2023-12-01"),
+    birthDate: new Date("1995-09-13"), // Born September 13, 1995 (29 years old)
+    joinedAt: new Date("2024-03-15"),
     isActive: true,
     managerId: "USR-003", // Managed by Morpheus
   },
@@ -89,7 +92,8 @@ const initialUsers: User[] = [
     avatar: "/professional-designer-avatar.png",
     phone: "+1 (555) 234-5678",
     location: "New York, NY",
-    joinedAt: new Date("2023-11-15"),
+    birthDate: new Date("1990-03-31"), // Born March 31, 1990 (34 years old)
+    joinedAt: new Date("2024-01-10"),
     isActive: true,
     managerId: "USR-003", // Managed by Morpheus
   },
@@ -101,7 +105,8 @@ const initialUsers: User[] = [
     avatar: "/professional-manager-avatar.jpg",
     phone: "+1 (555) 345-6789",
     location: "Austin, TX",
-    joinedAt: new Date("2023-10-01"),
+    birthDate: new Date("1978-07-04"), // Born July 4, 1978 (46 years old)
+    joinedAt: new Date("2023-08-01"),
     isActive: true,
     managerId: "USR-005", // Managed by Oracle
   },
@@ -113,7 +118,8 @@ const initialUsers: User[] = [
     avatar: "/professional-qa-avatar.jpg",
     phone: "+1 (555) 456-7890",
     location: "Seattle, WA",
-    joinedAt: new Date("2023-12-15"),
+    birthDate: new Date("1988-12-25"), // Born December 25, 1988 (36 years old)
+    joinedAt: new Date("2024-02-20"),
     isActive: true,
     managerId: "USR-003", // Managed by Morpheus
   },
@@ -121,11 +127,12 @@ const initialUsers: User[] = [
     id: "USR-005",
     name: "Oracle",
     email: "oracle@flowcraft.com",
-    role: "admin",
+    role: "boss",
     avatar: "/professional-admin-avatar.png",
     phone: "+1 (555) 567-8901",
     location: "Los Angeles, CA",
-    joinedAt: new Date("2023-09-01"),
+    birthDate: new Date("1970-05-12"), // Born May 12, 1970 (54 years old)
+    joinedAt: new Date("2023-06-01"),
     isActive: true,
     managerId: undefined, // CEO/Top level
   },
@@ -205,7 +212,7 @@ const initialSprints: Sprint[] = [
 ]
 
 const roleColors = {
-  admin: "bg-red-100 text-red-800 border-red-200",
+  boss: "bg-red-100 text-red-800 border-red-200",
   manager: "bg-blue-100 text-blue-800 border-blue-200",
   developer: "bg-green-100 text-green-800 border-green-200",
   designer: "bg-purple-100 text-purple-800 border-purple-200",
@@ -213,10 +220,11 @@ const roleColors = {
 }
 
 export default function FlowCraft() {
+  const [isLoading, setIsLoading] = useState(true)
   const [users, setUsers] = useState<User[]>(initialUsers)
   const [issues, setIssues] = useState<Issue[]>(initialIssues)
   const [sprints, setSprints] = useState<Sprint[]>(initialSprints)
-  const [activeView, setActiveView] = useState<"issues" | "kanban" | "sprints" | "users">("issues")
+  const [activeView, setActiveView] = useState<"issues" | "kanban" | "sprints" | "users" | "organization">("issues")
   const [standardTheme, setStandardTheme] = useState<"light" | "dark">("light")
   const [cyberpunkTheme, setCyberpunkTheme] = useState<"cyberpunk" | "turbo-matrix">("cyberpunk")
   const [isStandardMode, setIsStandardMode] = useState(true) // true = standard themes, false = cyberpunk themes
@@ -227,6 +235,8 @@ export default function FlowCraft() {
     phone: "",
     location: "",
     managerId: "",
+    spawnDate: "",
+    userType: "user" as "top-management" | "user",
   })
   const [newIssue, setNewIssue] = useState<{
     title: string
@@ -269,13 +279,14 @@ export default function FlowCraft() {
       role: newUser.role,
       phone: newUser.phone,
       location: newUser.location,
+      birthDate: newUser.spawnDate ? new Date(newUser.spawnDate) : undefined,
       joinedAt: new Date(),
       isActive: true,
-      managerId: newUser.managerId || undefined,
+      managerId: newUser.userType === "top-management" ? undefined : (newUser.managerId || undefined),
     }
 
     setUsers([...users, user])
-    setNewUser({ name: "", email: "", role: "developer", phone: "", location: "", managerId: "" })
+    setNewUser({ name: "", email: "", role: "developer", phone: "", location: "", managerId: "", spawnDate: "", userType: "user" })
     setIsCreateUserOpen(false)
   }
 
@@ -299,6 +310,17 @@ export default function FlowCraft() {
 
   // Get user by ID
   const getUserById = (userId: string) => users.find((user) => user.id === userId)
+
+  // Calculate age from birth date
+  const calculateAge = (birthDate: Date) => {
+    const today = new Date()
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+    return age
+  }
 
   // Generate next issue ID
   const generateIssueId = () => {
@@ -469,6 +491,38 @@ export default function FlowCraft() {
     return [manager, ...getManagerChain(manager.id)]
   }
 
+  // Build organization hierarchy tree
+  interface OrgNode {
+    user: User
+    children: OrgNode[]
+    level: number
+  }
+
+  const buildOrgTree = (): OrgNode[] => {
+    // Find top-level users (no manager)
+    const topLevel = users.filter((user) => !user.managerId && user.isActive)
+
+    const buildNode = (user: User, level: number): OrgNode => {
+      const directReports = getDirectReports(user.id)
+      return {
+        user,
+        children: directReports.map((report) => buildNode(report, level + 1)),
+        level,
+      }
+    }
+
+    return topLevel.map((user) => buildNode(user, 0))
+  }
+
+  useEffect(() => {
+    // Loading screen timer
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 2000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
   useEffect(() => {
     document.documentElement.classList.remove("dark", "cyberpunk", "turbo-matrix")
 
@@ -494,6 +548,111 @@ export default function FlowCraft() {
     setIsStandardMode((prev) => !prev)
   }
 
+  // Organization Chart Component
+  const OrgChart = ({ node }: { node: OrgNode }) => {
+    const userIssues = issues.filter((issue) => issue.assigneeId === node.user.id)
+    const completedIssues = userIssues.filter((issue) => issue.status === "done")
+
+    return (
+      <div className="flex flex-col items-center">
+        {/* User Card */}
+        <Card className="professional-card hover-lift w-80 mb-4">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <Avatar className="w-12 h-12">
+                <AvatarImage src={node.user.avatar || "/placeholder.svg"} />
+                <AvatarFallback>
+                  {node.user.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-foreground">{node.user.name}</h3>
+                  {!node.user.managerId && (
+                    <Badge variant="default" className="text-xs bg-gradient-to-r from-purple-600 to-blue-600">
+                      Top Mgmt
+                    </Badge>
+                  )}
+                </div>
+                <Badge className={`${roleColors[node.user.role]} text-xs`} variant="outline">
+                  {node.user.role}
+                </Badge>
+              </div>
+            </div>
+            <div className="space-y-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Mail className="w-3 h-3" />
+                <span>{node.user.email}</span>
+              </div>
+              {node.user.location && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-3 h-3" />
+                  <span>{node.user.location}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span>Tasks: {userIssues.length}</span>
+                <span className="text-green-600">Done: {completedIssues.length}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Connecting Line */}
+        {node.children.length > 0 && (
+          <div className="relative">
+            <div className="w-px h-6 bg-border mx-auto" />
+            <div className="w-full h-px bg-border absolute top-6 left-0" />
+          </div>
+        )}
+
+        {/* Children */}
+        {node.children.length > 0 && (
+          <div className="flex gap-8 mt-6 relative">
+            {node.children.map((child, index) => (
+              <div key={child.user.id} className="relative">
+                {/* Vertical line to child */}
+                <div className="absolute w-px h-6 bg-border left-1/2 -translate-x-1/2 -top-6" />
+                <OrgChart node={child} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Loading Screen
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted">
+        <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-500">
+          <div className="relative w-48 h-48 flex items-center justify-center">
+            <Image 
+              src="/logo.png" 
+              alt="floŁ krafT Logo" 
+              width={192}
+              height={192}
+              className="object-contain animate-pulse"
+              priority
+            />
+          </div>
+          <h1 className="text-4xl font-bold text-foreground tracking-wide">
+            floŁ krafT
+          </h1>
+          <div className="flex gap-2">
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="flex h-screen">
@@ -501,11 +660,18 @@ export default function FlowCraft() {
         <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
           <div className="p-6 border-b border-sidebar-border">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-primary-foreground" />
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                <Image 
+                  src="/logo.png" 
+                  alt="floŁ krafT Logo" 
+                  width={40}
+                  height={40}
+                  className="object-contain p-1"
+                  priority
+                />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-sidebar-foreground">FlowCraft</h1>
+                <h1 className="text-lg font-semibold text-sidebar-foreground">floŁ krafT</h1>
                 <p className="text-xs text-sidebar-foreground/60">Project Management</p>
               </div>
             </div>
@@ -544,6 +710,14 @@ export default function FlowCraft() {
               >
                 <Users className="w-4 h-4" />
                 Users
+              </Button>
+              <Button
+                variant={activeView === "organization" ? "default" : "ghost"}
+                onClick={() => setActiveView("organization")}
+                className="w-full justify-start gap-3 h-10"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Organization
               </Button>
             </div>
           </nav>
@@ -601,12 +775,14 @@ export default function FlowCraft() {
                   {activeView === "kanban" && "Board"}
                   {activeView === "sprints" && "Sprints"}
                   {activeView === "users" && "Users"}
+                  {activeView === "organization" && "Organization"}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   {activeView === "issues" && `${issues.length} issues total`}
                   {activeView === "kanban" && activeSprint ? `${activeSprint.name}` : "No active sprint"}
                   {activeView === "sprints" && `${sprints.length} sprints`}
                   {activeView === "users" && `${users.filter((u) => u.isActive).length} active users`}
+                  {activeView === "organization" && "Company hierarchy and reporting structure"}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -808,6 +984,23 @@ export default function FlowCraft() {
                             />
                           </div>
                         </div>
+                        <div>
+                          <Label htmlFor="user-type">User Type</Label>
+                          <Select
+                            value={newUser.userType}
+                            onValueChange={(value) =>
+                              setNewUser({ ...newUser, userType: value as "top-management" | "user", managerId: value === "top-management" ? "" : newUser.managerId })
+                            }
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="user">User</SelectItem>
+                              <SelectItem value="top-management">Top Management</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <Label htmlFor="user-role">Role</Label>
@@ -819,7 +1012,7 @@ export default function FlowCraft() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="admin">Admin</SelectItem>
+                                <SelectItem value="boss">BOSS</SelectItem>
                                 <SelectItem value="manager">Manager</SelectItem>
                                 <SelectItem value="developer">Developer</SelectItem>
                                 <SelectItem value="designer">Designer</SelectItem>
@@ -849,28 +1042,47 @@ export default function FlowCraft() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="user-manager">Manager (Optional)</Label>
-                          <Select
-                            value={newUser.managerId || "none"}
-                            onValueChange={(value) =>
-                              setNewUser({ ...newUser, managerId: value === "none" ? "" : value })
-                            }
-                          >
-                            <SelectTrigger className="mt-1">
-                              <SelectValue placeholder="No manager" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">No manager</SelectItem>
-                              {users
-                                .filter((user) => user.isActive && (user.role === "manager" || user.role === "admin"))
-                                .map((user) => (
-                                  <SelectItem key={user.id} value={user.id}>
-                                    {user.name} ({user.role})
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
+                          <Label htmlFor="user-spawn-date">Date of Birth (Optional)</Label>
+                          <Input
+                            id="user-spawn-date"
+                            type="date"
+                            value={newUser.spawnDate}
+                            onChange={(e) => setNewUser({ ...newUser, spawnDate: e.target.value })}
+                            className="mt-1"
+                          />
                         </div>
+                        {newUser.userType === "user" && (
+                          <div>
+                            <Label htmlFor="user-manager">Manager (Optional)</Label>
+                            <Select
+                              value={newUser.managerId || "none"}
+                              onValueChange={(value) =>
+                                setNewUser({ ...newUser, managerId: value === "none" ? "" : value })
+                              }
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="No manager" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">No manager</SelectItem>
+                                {users
+                                  .filter((user) => user.isActive && (user.role === "manager" || user.role === "boss"))
+                                  .map((user) => (
+                                    <SelectItem key={user.id} value={user.id}>
+                                      {user.name} ({user.role})
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                        {newUser.userType === "top-management" && (
+                          <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                            <p className="text-sm text-muted-foreground">
+                              <strong>Top Management</strong> users do not require a manager assignment.
+                            </p>
+                          </div>
+                        )}
                         <Button onClick={createUser} className="w-full">
                           Add User
                         </Button>
@@ -1127,7 +1339,14 @@ export default function FlowCraft() {
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <h3 className="font-semibold text-foreground">{user.name}</h3>
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-semibold text-foreground">{user.name}</h3>
+                                  {!user.managerId && (
+                                    <Badge variant="default" className="text-xs bg-gradient-to-r from-purple-600 to-blue-600">
+                                      Top Mgmt
+                                    </Badge>
+                                  )}
+                                </div>
                                 <Badge className={roleColors[user.role]} variant="outline">
                                   {user.role}
                                 </Badge>
@@ -1241,8 +1460,15 @@ export default function FlowCraft() {
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
-                              <span>Joined {user.joinedAt.toLocaleDateString()}</span>
+                            <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border">
+                              <div className="flex flex-col gap-1 pt-2">
+                                {user.birthDate && (
+                                  <span>
+                                    Born {user.birthDate.toLocaleDateString()} (Age: {calculateAge(user.birthDate)})
+                                  </span>
+                                )}
+                                <span>Joined {user.joinedAt.toLocaleDateString()}</span>
+                              </div>
                               <Badge variant={user.isActive ? "default" : "secondary"} className="text-xs">
                                 {user.isActive ? "Active" : "Inactive"}
                               </Badge>
@@ -1445,6 +1671,24 @@ export default function FlowCraft() {
                 })}
               </div>
             )}
+
+            {/* Organization View */}
+            {activeView === "organization" && (
+              <div className="space-y-6">
+                <Card className="professional-card">
+                  <CardHeader>
+                    <CardTitle>Organization Structure</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-8">
+                      {buildOrgTree().map((rootNode) => (
+                        <OrgChart key={rootNode.user.id} node={rootNode} />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </main>
       </div>
@@ -1609,7 +1853,7 @@ export default function FlowCraft() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="boss">BOSS</SelectItem>
                       <SelectItem value="manager">Manager</SelectItem>
                       <SelectItem value="developer">Developer</SelectItem>
                       <SelectItem value="designer">Designer</SelectItem>
@@ -1637,6 +1881,18 @@ export default function FlowCraft() {
                 />
               </div>
               <div>
+                <Label htmlFor="edit-user-birthdate">Date of Birth</Label>
+                <Input
+                  id="edit-user-birthdate"
+                  type="date"
+                  value={editingUser.birthDate ? editingUser.birthDate.toISOString().split("T")[0] : ""}
+                  onChange={(e) =>
+                    setEditingUser({ ...editingUser, birthDate: e.target.value ? new Date(e.target.value) : undefined })
+                  }
+                  className="mt-1"
+                />
+              </div>
+              <div>
                 <Label htmlFor="edit-user-manager">Manager</Label>
                 <Select
                   value={editingUser.managerId || "none"}
@@ -1654,7 +1910,7 @@ export default function FlowCraft() {
                         (user) =>
                           user.isActive &&
                           user.id !== editingUser.id &&
-                          (user.role === "manager" || user.role === "admin"),
+                          (user.role === "manager" || user.role === "boss"),
                       )
                       .map((user) => (
                         <SelectItem key={user.id} value={user.id}>

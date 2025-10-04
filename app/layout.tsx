@@ -10,9 +10,13 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "FlowCraft - Project Management",
+  title: "floŁ krafT - Project Management",
   description: "Professional task management and project tracking system",
-    generator: 'v0.app'
+  generator: 'v0.app',
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
 }
 
 export default function RootLayout({
