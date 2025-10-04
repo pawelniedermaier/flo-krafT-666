@@ -221,10 +221,13 @@ const roleColors = {
 
 export default function FlowCraft() {
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [users, setUsers] = useState<User[]>(initialUsers)
   const [issues, setIssues] = useState<Issue[]>(initialIssues)
   const [sprints, setSprints] = useState<Sprint[]>(initialSprints)
-  const [activeView, setActiveView] = useState<"issues" | "kanban" | "sprints" | "users" | "organization">("issues")
+  const [activeView, setActiveView] = useState<"issues" | "kanban" | "sprints" | "users" | "organization" | "tarot">("issues")
+  const [tarotCard, setTarotCard] = useState<{ name: string; meaning: string; advice: string } | null>(null)
+  const [destinyCard, setDestinyCard] = useState<{ name: string; subtitle: string; image: string; description: string } | null>(null)
   const [standardTheme, setStandardTheme] = useState<"light" | "dark">("light")
   const [cyberpunkTheme, setCyberpunkTheme] = useState<"cyberpunk" | "turbo-matrix">("cyberpunk")
   const [isStandardMode, setIsStandardMode] = useState(true) // true = standard themes, false = cyberpunk themes
@@ -237,6 +240,7 @@ export default function FlowCraft() {
     managerId: "",
     spawnDate: "",
     userType: "user" as "top-management" | "user",
+    avatar: "",
   })
   const [newIssue, setNewIssue] = useState<{
     title: string
@@ -268,6 +272,18 @@ export default function FlowCraft() {
     return `USR-${String(maxId + 1).padStart(3, "0")}`
   }
 
+  // Handle avatar file upload
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setNewUser({ ...newUser, avatar: reader.result as string })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   // Create new user
   const createUser = () => {
     if (!newUser.name.trim() || !newUser.email.trim()) return
@@ -277,6 +293,7 @@ export default function FlowCraft() {
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
+      avatar: newUser.avatar || undefined,
       phone: newUser.phone,
       location: newUser.location,
       birthDate: newUser.spawnDate ? new Date(newUser.spawnDate) : undefined,
@@ -286,7 +303,7 @@ export default function FlowCraft() {
     }
 
     setUsers([...users, user])
-    setNewUser({ name: "", email: "", role: "developer", phone: "", location: "", managerId: "", spawnDate: "", userType: "user" })
+    setNewUser({ name: "", email: "", role: "developer", phone: "", location: "", managerId: "", spawnDate: "", userType: "user", avatar: "" })
     setIsCreateUserOpen(false)
   }
 
@@ -518,7 +535,7 @@ export default function FlowCraft() {
     // Loading screen timer
     const timer = setTimeout(() => {
       setIsLoading(false)
-    }, 2000)
+    }, 3000)
 
     return () => clearTimeout(timer)
   }, [])
@@ -546,6 +563,102 @@ export default function FlowCraft() {
 
   const switchThemeMode = () => {
     setIsStandardMode((prev) => !prev)
+  }
+
+  // Tarot card reading for the boss
+  const tarotCards = [
+    {
+      name: "The Overwhelmed Developer",
+      meaning: "Your team is drowning in technical debt and legacy code.",
+      advice: "Hire more developers or lower your expectations. Preferably both."
+    },
+    {
+      name: "The Infinite Sprint",
+      meaning: "This sprint will never end. Time is a flat circle.",
+      advice: "Accept that deadlines are merely suggestions whispered by optimists."
+    },
+    {
+      name: "The Meeting Vortex",
+      meaning: "All productivity shall be consumed by synchronous communication.",
+      advice: "Schedule a meeting to discuss why there are too many meetings."
+    },
+    {
+      name: "The Scope Creep",
+      meaning: "What started as a button is now an entire microservice architecture.",
+      advice: "Just one more feature. What could go wrong?"
+    },
+    {
+      name: "The Burning Budget",
+      meaning: "Money flows like water through a colander.",
+      advice: "Have you considered blaming the economy?"
+    },
+    {
+      name: "The Mystical Deadline",
+      meaning: "The deadline approaches, yet nothing is ready.",
+      advice: "Move it to the next quarter. Nobody will remember."
+    },
+    {
+      name: "The Coffee Dependency",
+      meaning: "Your team's blood is 80% caffeine.",
+      advice: "Invest in a commercial espresso machine. It's cheaper than therapy."
+    },
+    {
+      name: "The Technical Debt Collector",
+      meaning: "The sins of past shortcuts have come due.",
+      advice: "Rewrite everything from scratch. What's another 6 months?"
+    },
+    {
+      name: "The Bus Factor",
+      meaning: "Only one person knows how the system works. They're on vacation.",
+      advice: "Pray they don't win the lottery."
+    },
+    {
+      name: "The Stakeholder Paradox",
+      meaning: "They want it fast, cheap, and perfect. Pick one.",
+      advice: "Nod and smile. Then do whatever makes sense."
+    },
+    {
+      name: "The Documentation Void",
+      meaning: "No one knows how anything works. The code is the documentation.",
+      advice: "The real documentation was the friends we made along the way."
+    },
+    {
+      name: "The Production Incident",
+      meaning: "Something is on fire. Possibly everything.",
+      advice: "Have you tried turning it off and on again?"
+    }
+  ]
+
+  const drawTarotCard = () => {
+    const randomCard = tarotCards[Math.floor(Math.random() * tarotCards.length)]
+    setTarotCard(randomCard)
+  }
+
+  // Destiny Decision Cards
+  const destinyCards = [
+    {
+      name: "I The Magician",
+      subtitle: "Green Light (Go For It)",
+      image: "/go.png",
+      description: "You've received the \"green light\"! It's time to hit the ground running, as this is a perfect opportunity for you to prove the project makes sense yourself. Good luck, because from now on, everything depends solely on you."
+    },
+    {
+      name: "VIII Justice",
+      subtitle: "The Process (Stop)",
+      image: "/stop.png",
+      description: "Hold on a moment! Your decision requires \"further analysis\" and going through \"necessary procedures.\" Expect your idea to be trapped in bureaucratic limbo, where truth is relative and the process is eternal."
+    },
+    {
+      name: "XII The Hanged Man",
+      subtitle: "The Justification (No Go)",
+      image: "/process.png",
+      description: "Your project is \"suspended\" awaiting... better times. Prepare for acrobatics to justify why it didn't work. Most likely, you'll end up being blamed, but at least you'll gain a \"new perspective.\""
+    }
+  ]
+
+  const drawDestinyCard = () => {
+    const randomCard = destinyCards[Math.floor(Math.random() * destinyCards.length)]
+    setDestinyCard(randomCard)
   }
 
   // Organization Chart Component
@@ -629,24 +742,104 @@ export default function FlowCraft() {
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted">
-        <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-500">
-          <div className="relative w-48 h-48 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-12 animate-in fade-in zoom-in duration-500">
+          <div className="relative w-[28rem] h-80 flex items-center justify-center mb-8">
             <Image 
               src="/logo.png" 
-              alt="floŁ krafT Logo" 
-              width={192}
-              height={192}
-              className="object-contain animate-pulse"
+              alt="Logo" 
+              width={448}
+              height={320}
+              className="object-contain"
               priority
             />
           </div>
-          <h1 className="text-4xl font-bold text-foreground tracking-wide">
-            floŁ krafT
+          <h1 className="text-4xl font-bold tracking-wide text-center mt-12 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent animate-pulse">
+            🚀 THE BEST KORPO PROJECT TOOL EVER! 🚀
           </h1>
           <div className="flex gap-2">
             <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
             <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
             <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // User Selection Screen
+  if (!selectedUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-8">
+        <div className="w-full max-w-6xl animate-in fade-in zoom-in duration-500">
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-6">
+              <Image 
+                src="/logo2.png" 
+                alt="Logo" 
+                width={200}
+                height={64}
+                className="object-contain"
+                priority
+              />
+            </div>
+            <h2 className="text-3xl font-bold text-foreground mb-2">Choose Your Profile</h2>
+            <p className="text-muted-foreground">Select a user to continue</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {users.filter((user) => user.isActive).map((user) => {
+              const userIssues = issues.filter((issue) => issue.assigneeId === user.id)
+              const completedIssues = userIssues.filter((issue) => issue.status === "done")
+              
+              return (
+                <Card 
+                  key={user.id} 
+                  className="professional-card hover-lift cursor-pointer transition-all hover:scale-105"
+                  onClick={() => setSelectedUser(user)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex flex-col items-center text-center gap-4">
+                      <Avatar className="w-24 h-24 ring-4 ring-primary/10">
+                        <AvatarImage src={user.avatar || "/placeholder.svg"} />
+                        <AvatarFallback className="text-2xl">
+                          {user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="space-y-2 w-full">
+                        <div className="flex items-center justify-center gap-2">
+                          <h3 className="text-xl font-semibold text-foreground">{user.name}</h3>
+                          {!user.managerId && (
+                            <Badge variant="default" className="text-xs bg-gradient-to-r from-purple-600 to-blue-600">
+                              Top Mgmt
+                            </Badge>
+                          )}
+                        </div>
+                        <Badge className={`${roleColors[user.role]}`} variant="outline">
+                          {user.role}
+                        </Badge>
+                      </div>
+
+                      <div className="w-full pt-4 border-t border-border">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Tasks</p>
+                            <p className="text-lg font-semibold text-foreground">{userIssues.length}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Done</p>
+                            <p className="text-lg font-semibold text-green-600">{completedIssues.length}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -659,20 +852,16 @@ export default function FlowCraft() {
         {/* Left Sidebar */}
         <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
           <div className="p-6 border-b border-sidebar-border">
-            <div className="flex items-center gap-3">
-              <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+            <div className="flex items-center justify-center">
+              <div className="relative w-full h-16 flex items-center justify-center">
                 <Image 
-                  src="/logo.png" 
-                  alt="floŁ krafT Logo" 
-                  width={40}
-                  height={40}
-                  className="object-contain p-1"
+                  src="/logo2.png" 
+                  alt="Logo" 
+                  width={200}
+                  height={64}
+                  className="object-contain"
                   priority
                 />
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-sidebar-foreground">floŁ krafT</h1>
-                <p className="text-xs text-sidebar-foreground/60">Project Management</p>
               </div>
             </div>
           </div>
@@ -719,10 +908,55 @@ export default function FlowCraft() {
                 <BarChart3 className="w-4 h-4" />
                 Organization
               </Button>
+              
+              {/* Special Boss-only Feature */}
+              {selectedUser?.role === "boss" && (
+                <>
+                  <div className="my-2 border-t border-sidebar-border" />
+                  <Button
+                    variant={activeView === "tarot" ? "default" : "ghost"}
+                    onClick={() => setActiveView("tarot")}
+                    className={`w-full justify-start gap-3 h-10 ${activeView === "tarot" ? "bg-gradient-to-r from-purple-600 to-indigo-600" : ""}`}
+                  >
+                    <span className="text-lg">🔮</span>
+                    TAROT AI BOOST
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
 
-          <div className="p-4 border-t border-sidebar-border">
+          <div className="p-4 border-t border-sidebar-border space-y-4">
+            {/* Current User */}
+            <div className="px-3 py-2 bg-sidebar-accent rounded-lg">
+              <p className="text-xs text-sidebar-foreground/60 mb-2">Logged in as</p>
+              <div className="flex items-center gap-2">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={selectedUser?.avatar || "/placeholder.svg"} />
+                  <AvatarFallback className="text-xs">
+                    {selectedUser?.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-sidebar-foreground truncate">{selectedUser?.name}</p>
+                  <Badge className={`${roleColors[selectedUser?.role || "developer"]} text-xs`} variant="outline">
+                    {selectedUser?.role}
+                  </Badge>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedUser(null)}
+                className="w-full mt-3 text-xs"
+              >
+                Switch User
+              </Button>
+            </div>
+
             <div className="space-y-2">
               {/* Standard Light/Dark Toggle */}
               <Button
@@ -783,6 +1017,7 @@ export default function FlowCraft() {
                   {activeView === "sprints" && `${sprints.length} sprints`}
                   {activeView === "users" && `${users.filter((u) => u.isActive).length} active users`}
                   {activeView === "organization" && "Company hierarchy and reporting structure"}
+                  {activeView === "tarot" && "🔮 Mystical insights for the enlightened leader"}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -961,6 +1196,30 @@ export default function FlowCraft() {
                         <DialogTitle>Add New User</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
+                        <div className="flex flex-col items-center gap-4 p-4 border border-border rounded-lg bg-muted/30">
+                          <Avatar className="w-24 h-24">
+                            <AvatarImage src={newUser.avatar || "/placeholder.svg"} />
+                            <AvatarFallback>
+                              {newUser.name
+                                ? newUser.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                : "?"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="w-full">
+                            <Label htmlFor="user-avatar">Profile Picture</Label>
+                            <Input
+                              id="user-avatar"
+                              type="file"
+                              accept="image/*"
+                              onChange={handleAvatarUpload}
+                              className="mt-1"
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">Upload an image from your computer</p>
+                          </div>
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <Label htmlFor="user-name">Full Name</Label>
@@ -1687,6 +1946,244 @@ export default function FlowCraft() {
                     </div>
                   </CardContent>
                 </Card>
+              </div>
+            )}
+
+            {/* Tarot AI Boost - Boss Only */}
+            {activeView === "tarot" && selectedUser?.role === "boss" && (
+              <div className="space-y-6">
+                {/* Warning Banner */}
+                <div className="bg-gradient-to-r from-purple-900 to-indigo-900 border-2 border-purple-500 rounded-lg p-6 text-white shadow-2xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-3xl">🔮</span>
+                    <h3 className="text-2xl font-bold">TAROT AI BOOST™</h3>
+                    <span className="text-3xl">✨</span>
+                  </div>
+                  <p className="text-purple-200 text-sm italic">
+                    "When data-driven decisions fail, consult the ancient arts of middle management mysticism."
+                  </p>
+                </div>
+
+                {/* Main Tarot Card Area */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Left: Tarot Draw */}
+                  <Card className="bg-gradient-to-br from-purple-950 to-indigo-950 border-purple-500 border-2 shadow-2xl">
+                    <CardHeader>
+                      <CardTitle className="text-purple-200 flex items-center gap-2">
+                        <span>🌙</span> Divine Your Project's Fate
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="text-center space-y-4">
+                        <p className="text-purple-300 text-sm">
+                          Harness the power of corporate mysticism. Click below to reveal what the universe (and your quarterly reports) have in store.
+                        </p>
+                        <Button
+                          onClick={drawTarotCard}
+                          className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-6 text-lg shadow-lg hover:shadow-purple-500/50 transition-all"
+                        >
+                          <span className="mr-2">🎴</span>
+                          DRAW A CARD OF DESTINY
+                          <span className="ml-2">🎴</span>
+                        </Button>
+                      </div>
+
+                      {!tarotCard && (
+                        <div className="text-center py-12 border-2 border-dashed border-purple-700 rounded-lg bg-purple-950/30">
+                          <p className="text-purple-400 text-sm italic">The cards await your command...</p>
+                          <p className="text-purple-500 text-xs mt-2">⭐ 100% accuracy guaranteed* ⭐</p>
+                          <p className="text-purple-600 text-xs mt-1">*Not actually guaranteed</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Right: Card Reading */}
+                  {tarotCard && (
+                    <Card className="bg-gradient-to-br from-indigo-950 to-purple-950 border-purple-500 border-2 shadow-2xl animate-in fade-in zoom-in duration-500">
+                      <CardHeader>
+                        <CardTitle className="text-purple-200 flex items-center gap-2">
+                          <span>✨</span> Your Reading
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        {/* Card Display */}
+                        <div className="bg-gradient-to-b from-purple-900 to-indigo-900 p-8 rounded-lg border-2 border-purple-400 shadow-xl">
+                          <div className="text-center space-y-4">
+                            <div className="text-6xl mb-4">🎴</div>
+                            <h3 className="text-2xl font-bold text-purple-100">{tarotCard.name}</h3>
+                          </div>
+                        </div>
+
+                        {/* Meaning */}
+                        <div className="space-y-2">
+                          <h4 className="text-purple-300 font-semibold flex items-center gap-2">
+                            <span>🌟</span> The Meaning:
+                          </h4>
+                          <p className="text-purple-200 bg-purple-950/50 p-4 rounded border border-purple-700">
+                            {tarotCard.meaning}
+                          </p>
+                        </div>
+
+                        {/* Advice */}
+                        <div className="space-y-2">
+                          <h4 className="text-purple-300 font-semibold flex items-center gap-2">
+                            <span>💡</span> The Wisdom:
+                          </h4>
+                          <p className="text-purple-200 bg-purple-950/50 p-4 rounded border border-purple-700 italic">
+                            "{tarotCard.advice}"
+                          </p>
+                        </div>
+
+                        <Button
+                          onClick={drawTarotCard}
+                          variant="outline"
+                          className="w-full border-purple-500 text-purple-300 hover:bg-purple-900/50"
+                        >
+                          Draw Another Card
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+
+                {/* Statistics */}
+                <Card className="bg-gradient-to-r from-purple-950 to-indigo-950 border-purple-500 border-2">
+                  <CardHeader>
+                    <CardTitle className="text-purple-200 flex items-center gap-2">
+                      <span>📊</span> Your Mystical Dashboard
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-purple-900/30 p-4 rounded-lg border border-purple-700">
+                        <p className="text-purple-400 text-sm mb-1">Overworked Developers</p>
+                        <p className="text-3xl font-bold text-purple-200">{users.filter(u => u.role === "developer").length}</p>
+                        <p className="text-purple-500 text-xs mt-1">All of them</p>
+                      </div>
+                      <div className="bg-purple-900/30 p-4 rounded-lg border border-purple-700">
+                        <p className="text-purple-400 text-sm mb-1">Deadline Anxiety Level</p>
+                        <p className="text-3xl font-bold text-purple-200">∞</p>
+                        <p className="text-purple-500 text-xs mt-1">Off the charts</p>
+                      </div>
+                      <div className="bg-purple-900/30 p-4 rounded-lg border border-purple-700">
+                        <p className="text-purple-400 text-sm mb-1">Meetings This Week</p>
+                        <p className="text-3xl font-bold text-purple-200">Too Many</p>
+                        <p className="text-purple-500 text-xs mt-1">Could have been emails</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Destiny - Decision Feature */}
+                <Card className="bg-gradient-to-r from-indigo-950 to-purple-950 border-purple-500 border-2 shadow-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-purple-200 flex items-center gap-2">
+                      <span>⚖️</span> Destiny - Decision
+                    </CardTitle>
+                    <p className="text-purple-300 text-sm mt-2">
+                      Consult the ancient cards to determine your project's fate: Go, Stop, or Process?
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Draw Card Section */}
+                      <div className="space-y-4">
+                        <Button
+                          onClick={drawDestinyCard}
+                          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-6 text-lg shadow-lg hover:shadow-purple-500/50 transition-all"
+                        >
+                          <span className="mr-2">✨</span>
+                          REVEAL YOUR DESTINY
+                          <span className="ml-2">✨</span>
+                        </Button>
+
+                        {!destinyCard && (
+                          <div className="text-center py-12 border-2 border-dashed border-purple-700 rounded-lg bg-purple-950/30">
+                            <p className="text-purple-400 text-sm italic">The fates await your query...</p>
+                            <p className="text-purple-500 text-xs mt-2">🎴 Will you receive the green light? 🎴</p>
+                          </div>
+                        )}
+
+                        {destinyCard && (
+                          <div className="space-y-4 animate-in fade-in zoom-in duration-500">
+                            <div className="bg-gradient-to-b from-purple-900 to-indigo-900 p-6 rounded-lg border-2 border-purple-400 shadow-xl">
+                              <div className="text-center space-y-3">
+                                <div className="flex justify-center">
+                                  <div className="w-32 h-32 flex items-center justify-center">
+                                    <img
+                                      src={destinyCard.image}
+                                      alt={destinyCard.name}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  </div>
+                                </div>
+                                <h3 className="text-xl font-bold text-purple-100">{destinyCard.name}</h3>
+                                <p className="text-lg text-purple-300 font-semibold">{destinyCard.subtitle}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Card Description */}
+                      {destinyCard && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-right duration-500">
+                          <div className="bg-purple-950/50 p-6 rounded-lg border border-purple-700">
+                            <h4 className="text-purple-300 font-semibold mb-3 flex items-center gap-2">
+                              <span>📜</span> The Prophecy:
+                            </h4>
+                            <p className="text-purple-200 leading-relaxed">
+                              {destinyCard.description}
+                            </p>
+                          </div>
+
+                          <Button
+                            onClick={drawDestinyCard}
+                            variant="outline"
+                            className="w-full border-purple-500 text-purple-300 hover:bg-purple-900/50"
+                          >
+                            Seek Another Destiny
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Legend */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-purple-700">
+                      <div className="bg-green-950/30 p-4 rounded-lg border border-green-700">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">🟢</span>
+                          <p className="text-green-300 font-semibold text-sm">The Magician</p>
+                        </div>
+                        <p className="text-green-400 text-xs">Green Light - Full speed ahead!</p>
+                      </div>
+                      <div className="bg-red-950/30 p-4 rounded-lg border border-red-700">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">🔴</span>
+                          <p className="text-red-300 font-semibold text-sm">Justice</p>
+                        </div>
+                        <p className="text-red-400 text-xs">Stop - Bureaucratic limbo awaits</p>
+                      </div>
+                      <div className="bg-yellow-950/30 p-4 rounded-lg border border-yellow-700">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">🟡</span>
+                          <p className="text-yellow-300 font-semibold text-sm">The Hanged Man</p>
+                        </div>
+                        <p className="text-yellow-400 text-xs">No Go - Suspended indefinitely</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Disclaimer */}
+                <div className="bg-purple-950/30 border border-purple-800 rounded-lg p-4">
+                  <p className="text-purple-400 text-xs text-center italic">
+                    ⚠️ DISCLAIMER: TAROT AI BOOST™ is for entertainment purposes only. Any resemblance to actual project management advice is purely coincidental. 
+                    Side effects may include: existential dread, imposter syndrome, and an urge to update your LinkedIn profile. 
+                    Consult your Scrum Master before making any life-altering decisions based on mystical card readings. ⚠️
+                  </p>
+                </div>
               </div>
             )}
           </div>
