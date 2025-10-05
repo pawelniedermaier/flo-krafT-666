@@ -13,6 +13,8 @@ import MemeGeneratorView from "@/features/shared/components/meme-generator-view"
 import HellsAlarmView from "@/features/shared/components/hells-alarm-view"
 import BetrayalRankingView from "@/features/shared/components/betrayal-ranking-view"
 import StabBackView from "@/features/shared/components/stab-back-view"
+import UserBetrayalView from "@/features/shared/components/user-betrayal-view"
+import UserIncidentView from "@/features/shared/components/user-incident-view"
 import { NotificationCenter } from "@/features/shared/components/notification-center"
 import { NotificationScheduler } from "@/features/shared/components/notification-scheduler"
 import { LeaderboardView } from "@/features/shared/components/leaderboard-view"
@@ -289,11 +291,35 @@ export default function FlowCraft() {
             <OrganizationView users={users.users} issues={issues.issues} />
           )}
 
-          {/* Text Analysis */}
-          {activeView === "text-analysis" && <DevilCodeView />}
+          {/* Devil in the Code - Only for Boss and Director */}
+          {activeView === "text-analysis" && currentUser && (currentUser.role === "boss" || currentUser.role === "director") && (
+            <DevilCodeView />
+          )}
 
-          {/* Image Overlay */}
-          {activeView === "image-overlay" && <MemeGeneratorView />}
+          {/* Devil in the Code Access Denied */}
+          {activeView === "text-analysis" && currentUser && currentUser.role !== "boss" && currentUser.role !== "director" && (
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-bold mb-4">🔒 Access Denied</h2>
+              <p className="text-muted-foreground">
+                The Devil in the Code tool is only available for users with "boss" or "director" roles.
+              </p>
+            </div>
+          )}
+
+          {/* Meme Generator - Only for Boss and Director */}
+          {activeView === "image-overlay" && currentUser && (currentUser.role === "boss" || currentUser.role === "director") && (
+            <MemeGeneratorView />
+          )}
+
+          {/* Meme Generator Access Denied */}
+          {activeView === "image-overlay" && currentUser && currentUser.role !== "boss" && currentUser.role !== "director" && (
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-bold mb-4">🔒 Access Denied</h2>
+              <p className="text-muted-foreground">
+                The Meme Generator is only available for users with "boss" or "director" roles.
+              </p>
+            </div>
+          )}
 
           {/* Notifications - Only for Boss and Director */}
           {activeView === "notifications" && currentUser && (currentUser.role === "boss" || currentUser.role === "director") && (
@@ -310,17 +336,14 @@ export default function FlowCraft() {
             </div>
           )}
 
-          {/* Leaderboard - Only for Boss and Director */}
-          {activeView === "leaderboard" && currentUser && (currentUser.role === "boss" || currentUser.role === "director") && <BetrayalRankingView />}
+          {/* Betrayal Ranking - Different views for different roles */}
+          {activeView === "leaderboard" && currentUser && (currentUser.role === "boss" || currentUser.role === "director") && (
+            <BetrayalRankingView />
+          )}
 
-          {/* Leaderboard Access Denied */}
+          {/* User-friendly Betrayal Ranking for regular users */}
           {activeView === "leaderboard" && currentUser && currentUser.role !== "boss" && currentUser.role !== "director" && (
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold mb-4">🔒 Access Denied</h2>
-              <p className="text-muted-foreground">
-                The Leaderboard is only available for users with "boss" or "director" roles.
-              </p>
-            </div>
+            <UserBetrayalView />
           )}
 
           {/* Tarot AI Boost */}
@@ -336,8 +359,15 @@ export default function FlowCraft() {
             </div>
           )}
 
-          {/* Competitive Reports */}
-          {activeView === "competitive-reports" && <StabBackView />}
+          {/* Stab in the Back - Different views for different roles */}
+          {activeView === "competitive-reports" && currentUser && (currentUser.role === "boss" || currentUser.role === "director") && (
+            <StabBackView />
+          )}
+
+          {/* User-friendly Incident Reporting for regular users */}
+          {activeView === "competitive-reports" && currentUser && currentUser.role !== "boss" && currentUser.role !== "director" && (
+            <UserIncidentView />
+          )}
         </div>
       </main>
 

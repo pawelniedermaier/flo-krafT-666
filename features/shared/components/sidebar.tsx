@@ -113,23 +113,27 @@ export function Sidebar({
         {/* Corporate Culture Tools */}
         <div className="my-2 border-t border-sidebar-border" />
         
-        {/* Text Analysis */}
-        <Button
-          variant={activeView === "text-analysis" ? "default" : "ghost"}
-          onClick={() => onViewChange("text-analysis")}
-          className="w-full justify-start gap-3 h-10"
-        >
-          👹 Devil in the Code
-        </Button>
+        {/* Devil in the Code - Only for Boss and Director */}
+        {(currentUser?.role === "boss" || currentUser?.role === "director") && (
+          <Button
+            variant={activeView === "text-analysis" ? "default" : "ghost"}
+            onClick={() => onViewChange("text-analysis")}
+            className="w-full justify-start gap-3 h-10"
+          >
+            👹 Devil in the Code
+          </Button>
+        )}
 
-        {/* Image Overlay */}
-        <Button
-          variant={activeView === "image-overlay" ? "default" : "ghost"}
-          onClick={() => onViewChange("image-overlay")}
-          className="w-full justify-start gap-3 h-10"
-        >
-          🤡 Meme Generator
-        </Button>
+        {/* Meme Generator - Only for Boss and Director */}
+        {(currentUser?.role === "boss" || currentUser?.role === "director") && (
+          <Button
+            variant={activeView === "image-overlay" ? "default" : "ghost"}
+            onClick={() => onViewChange("image-overlay")}
+            className="w-full justify-start gap-3 h-10"
+          >
+            🤡 Meme Generator
+          </Button>
+        )}
 
         {/* Notifications - Only for Boss and Director */}
         {(currentUser?.role === "boss" || currentUser?.role === "director") && (
