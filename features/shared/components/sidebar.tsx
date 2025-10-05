@@ -119,8 +119,7 @@ export function Sidebar({
           onClick={() => onViewChange("text-analysis")}
           className="w-full justify-start gap-3 h-10"
         >
-          <Brain className="size-4" />
-          Text Analysis
+          👹 Devil in the Code
         </Button>
 
         {/* Image Overlay */}
@@ -129,8 +128,7 @@ export function Sidebar({
           onClick={() => onViewChange("image-overlay")}
           className="w-full justify-start gap-3 h-10"
         >
-          <ImageIcon className="size-4" />
-          Image Overlay
+          🤡 Meme Generator
         </Button>
 
         {/* Notifications - Only for Boss and Director */}
@@ -140,8 +138,7 @@ export function Sidebar({
             onClick={() => onViewChange("notifications")}
             className="w-full justify-start gap-3 h-10"
           >
-            <Bell className="size-4" />
-            Notifications
+            ⏰ Hell's Alarm Clock
           </Button>
         )}
 
@@ -152,8 +149,7 @@ export function Sidebar({
             onClick={() => onViewChange("leaderboard")}
             className="w-full justify-start gap-3 h-10"
           >
-            <Trophy className="size-4" />
-            Leaderboard
+            🫢 The Betrayal Ranking
           </Button>
         )}
 
@@ -163,8 +159,7 @@ export function Sidebar({
           onClick={() => onViewChange("competitive-reports")}
           className="w-full justify-start gap-3 h-10"
         >
-          <AlertTriangle className="size-4" />
-          Competitive Reports
+          🔪 Stab in the Back
         </Button>
 
         {/* Tarot AI Boost - Only for Boss */}
@@ -176,8 +171,7 @@ export function Sidebar({
               activeView === "tarot" ? "bg-gradient-to-r from-purple-600 to-indigo-600" : ""
             }`}
           >
-            <Sparkles className="size-4" />
-            TAROT AI BOOST
+            🧙‍♂️ Shadow of Mordor Tarot AI
           </Button>
         )}
       </nav>

@@ -8,6 +8,11 @@ import { ContentHeader } from "@/features/shared/components/content-header"
 import { TarotView } from "@/features/shared/components/tarot-view"
 import { TextAnalysisView } from "@/features/shared/components/text-analysis-view"
 import { ImageOverlayView } from "@/features/shared/components/image-overlay-view"
+import DevilCodeView from "@/features/shared/components/devil-code-view"
+import MemeGeneratorView from "@/features/shared/components/meme-generator-view"
+import HellsAlarmView from "@/features/shared/components/hells-alarm-view"
+import BetrayalRankingView from "@/features/shared/components/betrayal-ranking-view"
+import StabBackView from "@/features/shared/components/stab-back-view"
 import { NotificationCenter } from "@/features/shared/components/notification-center"
 import { NotificationScheduler } from "@/features/shared/components/notification-scheduler"
 import { LeaderboardView } from "@/features/shared/components/leaderboard-view"
@@ -285,20 +290,14 @@ export default function FlowCraft() {
           )}
 
           {/* Text Analysis */}
-          {activeView === "text-analysis" && <TextAnalysisView />}
+          {activeView === "text-analysis" && <DevilCodeView />}
 
           {/* Image Overlay */}
-          {activeView === "image-overlay" && <ImageOverlayView />}
+          {activeView === "image-overlay" && <MemeGeneratorView />}
 
           {/* Notifications - Only for Boss and Director */}
           {activeView === "notifications" && currentUser && (currentUser.role === "boss" || currentUser.role === "director") && (
-            <div className="space-y-6">
-              <NotificationCenter 
-                currentUserId={currentUser.id} 
-                currentUserName={currentUser.name} 
-              />
-              <NotificationScheduler users={users.users} />
-            </div>
+            <HellsAlarmView />
           )}
 
           {/* Notifications Access Denied */}
@@ -312,7 +311,7 @@ export default function FlowCraft() {
           )}
 
           {/* Leaderboard - Only for Boss and Director */}
-          {activeView === "leaderboard" && currentUser && (currentUser.role === "boss" || currentUser.role === "director") && <LeaderboardView />}
+          {activeView === "leaderboard" && currentUser && (currentUser.role === "boss" || currentUser.role === "director") && <BetrayalRankingView />}
 
           {/* Leaderboard Access Denied */}
           {activeView === "leaderboard" && currentUser && currentUser.role !== "boss" && currentUser.role !== "director" && (
@@ -338,7 +337,7 @@ export default function FlowCraft() {
           )}
 
           {/* Competitive Reports */}
-          {activeView === "competitive-reports" && <CompetitiveLeaderboardView />}
+          {activeView === "competitive-reports" && <StabBackView />}
         </div>
       </main>
 
