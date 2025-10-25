@@ -45,11 +45,11 @@ export function IssueList({ issues, users, onEdit, onDelete, onAdd }: IssueListP
 
       {/* Issues Grid */}
       {filteredIssues.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-12 text-center">
-          <p className="text-muted-foreground">No issues found</p>
+        <div className="rounded-lg border border-dashed p-8 lg:p-12 text-center">
+          <p className="text-muted-foreground text-sm lg:text-base">No issues found</p>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 lg:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {filteredIssues.map((issue) => (
             <IssueCard
               key={issue.id}

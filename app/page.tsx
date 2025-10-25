@@ -5,6 +5,8 @@ import { LoadingScreen } from "@/features/shared/components/loading-screen"
 import { UserSelection } from "@/features/shared/components/user-selection"
 import { Sidebar } from "@/features/shared/components/sidebar"
 import { ContentHeader } from "@/features/shared/components/content-header"
+import { MobileHeader } from "@/features/shared/components/mobile-header"
+import { MobileBottomNav } from "@/features/shared/components/mobile-bottom-nav"
 import { TarotView } from "@/features/shared/components/tarot-view"
 import { TextAnalysisView } from "@/features/shared/components/text-analysis-view"
 import { ImageOverlayView } from "@/features/shared/components/image-overlay-view"
@@ -216,31 +218,53 @@ export default function FlowCraft() {
   // Main Application
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Sidebar */}
-      <Sidebar
-        activeView={activeView}
-        onViewChange={setActiveView}
-        currentUser={currentUser}
-        users={users.users}
-        onUserChange={setCurrentUser}
-        theme={theme}
-        onThemeChange={setTheme}
-      />
+      {/* Sidebar - Hidden on mobile, shown on desktop */}
+      <div className="hidden lg:block">
+        <Sidebar
+          activeView={activeView}
+          onViewChange={setActiveView}
+          currentUser={currentUser}
+          users={users.users}
+          onUserChange={setCurrentUser}
+          theme={theme}
+          onThemeChange={setTheme}
+        />
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <ContentHeader
+      <main className="flex-1 flex flex-col overflow-hidden lg:ml-0">
+        {/* Mobile Header - Only visible on mobile */}
+        <MobileHeader
           activeView={activeView}
+          onViewChange={setActiveView}
+          currentUser={currentUser}
+          users={users.users}
+          onUserChange={setCurrentUser}
+          theme={theme}
+          onThemeChange={setTheme}
           issues={issues.issues}
           sprints={sprints.sprints}
-          users={users.users}
           onNewIssue={handleIssueAdd}
           onNewSprint={handleSprintAdd}
           onNewUser={handleUserAdd}
           onNewReport={handleReportSubmit}
         />
 
-        <div className="flex-1 overflow-auto p-6">
+        {/* Desktop Header - Only visible on desktop */}
+        <div className="hidden lg:block">
+          <ContentHeader
+            activeView={activeView}
+            issues={issues.issues}
+            sprints={sprints.sprints}
+            users={users.users}
+            onNewIssue={handleIssueAdd}
+            onNewSprint={handleSprintAdd}
+            onNewUser={handleUserAdd}
+            onNewReport={handleReportSubmit}
+          />
+        </div>
+
+        <div className="flex-1 overflow-auto p-4 lg:p-6 pb-20 lg:pb-6">
           {/* Issues List View */}
           {activeView === "issues" && (
             <IssueList
@@ -370,6 +394,12 @@ export default function FlowCraft() {
           )}
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav
+        activeView={activeView}
+        onViewChange={setActiveView}
+      />
 
       {/* Dialogs */}
       <IssueFormDialog

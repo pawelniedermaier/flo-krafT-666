@@ -68,9 +68,9 @@ export function IssueFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-0">
         <DialogHeader>
-          <DialogTitle>{issue ? "Edit Task" : "Create New Task"}</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">{issue ? "Edit Task" : "Create New Task"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -95,14 +95,14 @@ export function IssueFormDialog({
             />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select
                 value={formData.status}
                 onValueChange={(value) => setFormData({ ...formData, status: value as IssueStatus })}
               >
-                <SelectTrigger id="status">
+                <SelectTrigger id="status" className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -121,7 +121,7 @@ export function IssueFormDialog({
                 value={formData.priority}
                 onValueChange={(value) => setFormData({ ...formData, priority: value as IssuePriority })}
               >
-                <SelectTrigger id="priority">
+                <SelectTrigger id="priority" className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -135,14 +135,14 @@ export function IssueFormDialog({
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="assignee">Assignee</Label>
               <Select
                 value={formData.assigneeId || "unassigned"}
                 onValueChange={(value) => setFormData({ ...formData, assigneeId: value === "unassigned" ? undefined : value })}
               >
-                <SelectTrigger id="assignee">
+                <SelectTrigger id="assignee" className="h-11">
                   <SelectValue placeholder="Select assignee" />
                 </SelectTrigger>
                 <SelectContent>
@@ -162,7 +162,7 @@ export function IssueFormDialog({
                 value={formData.sprintId || "no-sprint"}
                 onValueChange={(value) => setFormData({ ...formData, sprintId: value === "no-sprint" ? undefined : value })}
               >
-                <SelectTrigger id="sprint">
+                <SelectTrigger id="sprint" className="h-11">
                   <SelectValue placeholder="Select sprint" />
                 </SelectTrigger>
                 <SelectContent>
@@ -177,11 +177,21 @@ export function IssueFormDialog({
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+              className="h-11 w-full sm:w-auto"
+            >
               Cancel
             </Button>
-            <Button type="submit">{issue ? "Update" : "Create"} Task</Button>
+            <Button 
+              type="submit" 
+              className="h-11 w-full sm:w-auto"
+            >
+              {issue ? "Update" : "Create"} Task
+            </Button>
           </div>
         </form>
       </DialogContent>
